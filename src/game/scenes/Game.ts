@@ -1,17 +1,34 @@
 import { Scene } from "phaser";
 import { EventBus } from "../EventBus";
 import { Control, createControl } from "../controll/control";
+import { createMap, preloadMap } from "../map/map";
 
 export type Player = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class Game extends Scene {
     control: Control;
     player: Player;
-
+    platform: Phaser.Physics.Arcade.StaticGroup;
     constructor() {
         super("Game");
     }
 
+    preload() {
+        this.load.setPath("assets");
+
+        this.load.image("star", "star.png");
+        this.load.image("background", "bg.png");
+        this.load.image("logo", "logo.png");
+        preloadMap(this);
+        this.load.spritesheet("cat", "cat.png", {
+            frameHeight: 16,
+            frameWidth: 16,
+        });
+        this.load.spritesheet("mario", "mario.png", {
+            frameWidth: 32,
+            frameHeight: 48,
+        });
+    }
     update(time: number, delta: number): void {
         const { A, D, W } = this.control;
 
@@ -26,7 +43,7 @@ export class Game extends Scene {
         } else {
             this.player.setVelocityX(0);
 
-            this.player.anims.play("turn");
+            this.player.anims.play("turn", true);
         }
 
         if (W.isDown && this.player.body.touching.down) {
@@ -34,67 +51,51 @@ export class Game extends Scene {
         }
     }
 
-    preload() {
-        this.load.setPath("assets");
-
-        this.load.image("star", "star.png");
-        this.load.image("background", "bg.png");
-        this.load.image("logo", "logo.png");
-        this.load.image("ground", "ground.png");
-        this.load.spritesheet("mario", "mario.png", {
-            frameWidth: 32,
-            frameHeight: 48,
-        });
-    }
-
     create() {
         this.control = createControl(this);
 
         this.add.image(512, 384, "background");
 
-        const platform = this.physics.add.staticGroup();
+        this.platform = this.physics.add.staticGroup();
 
-        " "
-            .repeat(12)
-            .split("")
-            .forEach((_, i) => {
-                platform.create(
-                    92 / 2 + i * 92,
-                    this.sys.game.canvas.height - 91 / 2,
-                    "ground"
-                );
-            });
+        createMap(this);
 
-        this.player = this.physics.add.sprite(100, 400, "mario");
+        this.player = this.physics.add.sprite(100, 400, "cat");
 
-        this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);
 
         this.anims.create({
             key: "left",
-            frames: this.anims.generateFrameNumbers("mario", {
-                start: 0,
-                end: 3,
+            frames: this.anims.generateFrameNumbers("cat", {
+                start: 5,
+                end: 6,
             }),
             repeat: -1,
+            frameRate: 4,
         });
 
         this.anims.create({
             key: "turn",
-            frames: [{ key: "mario", frame: 4 }],
-            repeat: 20,
+            frames: this.anims.generateFrameNumbers("cat", {
+                start: 0,
+                end: 2,
+            }),
+
+            frameRate: 3,
+            repeat: -1,
         });
 
         this.anims.create({
             key: "right",
-            frames: this.anims.generateFrameNumbers("mario", {
-                start: 5,
-                end: 8,
+            frames: this.anims.generateFrameNumbers("cat", {
+                start: 3,
+                end: 4,
             }),
+            frameRate: 4,
             repeat: -1,
         });
 
-        this.physics.add.collider(this.player, platform);
+        this.physics.add.collider(this.player, this.platform);
 
         EventBus.emit("current-scene-ready", this);
     }

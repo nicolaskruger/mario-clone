@@ -7,13 +7,14 @@ const config: Types.Core.GameConfig = {
     type: AUTO,
     width: 1024,
     height: 768,
+    fullscreenTarget: "game-container",
     parent: "game-container",
     backgroundColor: "#028af8",
     physics: {
         default: "arcade",
         arcade: {
             gravity: {
-                y: 30,
+                y: 1000,
                 x: 0,
             },
             debug: false,

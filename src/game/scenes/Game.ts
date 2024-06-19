@@ -7,7 +7,7 @@ export type Player = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class Game extends Scene {
     control: Control;
-    player: Player;
+    bat: Player;
     platform: Phaser.Physics.Arcade.StaticGroup;
     constructor() {
         super("Game");
@@ -21,8 +21,8 @@ export class Game extends Scene {
         this.load.image("logo", "logo.png");
         preloadMap(this);
         this.load.spritesheet("cat", "cat.png", {
-            frameHeight: 16,
-            frameWidth: 16,
+            frameHeight: 128,
+            frameWidth: 128,
         });
         this.load.spritesheet("mario", "mario.png", {
             frameWidth: 32,
@@ -33,21 +33,21 @@ export class Game extends Scene {
         const { A, D, W } = this.control;
 
         if (A.isDown) {
-            this.player.setVelocityX(-160);
+            this.bat.setVelocityX(-160);
 
-            this.player.anims.play("left", true);
+            this.bat.anims.play("left", true);
         } else if (D.isDown) {
-            this.player.setVelocityX(160);
+            this.bat.setVelocityX(160);
 
-            this.player.anims.play("right", true);
+            this.bat.anims.play("right", true);
         } else {
-            this.player.setVelocityX(0);
+            this.bat.setVelocityX(0);
 
-            this.player.anims.play("turn", true);
+            this.bat.anims.play("turn", true);
         }
 
-        if (W.isDown && this.player.body.touching.down) {
-            this.player.setVelocityY(-330);
+        if (W.isDown && this.bat.body.touching.down) {
+            this.bat.setVelocityY(-330);
         }
     }
 
@@ -57,12 +57,6 @@ export class Game extends Scene {
         this.add.image(512, 384, "background");
 
         this.platform = this.physics.add.staticGroup();
-
-        createMap(this);
-
-        this.player = this.physics.add.sprite(100, 400, "cat");
-
-        this.player.setCollideWorldBounds(true);
 
         this.anims.create({
             key: "left",
@@ -95,7 +89,8 @@ export class Game extends Scene {
             repeat: -1,
         });
 
-        this.physics.add.collider(this.player, this.platform);
+        createMap(this);
+        this.physics.add.collider(this.bat, this.platform);
 
         EventBus.emit("current-scene-ready", this);
     }

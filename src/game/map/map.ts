@@ -1,3 +1,4 @@
+import { createBatMap } from "../entities/bat";
 import { Game } from "../scenes/Game";
 
 const tileSize = 128;
@@ -8,15 +9,14 @@ export const preloadMap = (game: Game) => {
     game.load.image(img, "ground.png");
 };
 
-const line00 = "_________________";
-const line01 = "_________________";
-const line02 = "_________________";
-const line03 = "_________________";
-const line04 = "_________________";
-const line05 = "_M_______________";
-const line06 = "GGGGGGGGGGGGGGGGG";
+const line00 = "G________________";
+const line01 = "_G_______________";
+const line02 = "__G______________";
+const line03 = "___G_____________";
+const line04 = "_M__G____________";
+const line05 = "GGGGGGGGGGGGGGGGG";
 
-const map = [line00, line01, line02, line03, line04, line05, line06];
+const map = [line00, line01, line02, line03, line04, line05];
 
 type ObjNickName = "M" | "G" | "_";
 
@@ -32,7 +32,7 @@ const creator: EDictionary<
         game.platform.create(x, y, img);
     },
     _: () => {},
-    M: () => {},
+    M: createBatMap,
 };
 
 export const createMap = (game: Game) => {
@@ -40,8 +40,8 @@ export const createMap = (game: Game) => {
         line.split("").forEach((v, x) => {
             creator[v as keyof typeof creator](
                 game,
-                x * tileSize,
-                y * tileSize
+                x * tileSize + tileSize / 2,
+                y * tileSize + tileSize / 2
             );
         })
     );

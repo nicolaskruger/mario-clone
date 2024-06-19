@@ -1,5 +1,11 @@
 import { Game } from "../scenes/Game";
 
+const JUMP_COUNTER_MAX = 50;
+export type Bat = {
+    jump: boolean;
+    jumpCounter: number;
+};
+
 export const preloadBat = (game: Game) => {
     game.load.spritesheet("cat", "cat.png", {
         frameHeight: 128,
@@ -19,6 +25,8 @@ const TURN = "turn";
 export const updateBat = (game: Game) => {
     const { A, D, W } = game.control;
 
+    const { batInfo } = game;
+
     if (A.isDown) {
         game.bat.setVelocityX(-160);
         game.bat.anims.play(LEFT, true);
@@ -31,7 +39,17 @@ export const updateBat = (game: Game) => {
     }
 
     if (W.isDown && game.bat.body.touching.down) {
-        game.bat.setVelocityY(-330);
+        game.bat.setVelocityY(-650);
+        batInfo.jump = true;
+        batInfo.jumpCounter = 0;
+    }
+    if (batInfo.jump && W.isDown && batInfo.jumpCounter < JUMP_COUNTER_MAX) {
+        batInfo.jumpCounter++;
+    } else if (batInfo.jump) {
+        const newVelocity =
+            game.bat.body.velocity.y < 0 ? 0 : game.bat.body.velocity.y;
+        game.bat.setVelocityY(newVelocity);
+        batInfo.jump = false;
     }
 };
 

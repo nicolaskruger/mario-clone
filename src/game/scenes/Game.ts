@@ -2,16 +2,21 @@ import { Scene } from "phaser";
 import { EventBus } from "../EventBus";
 import { Control, createControl } from "../controll/control";
 import { createMap, preloadMap } from "../map/map";
-import { createBatAnime, preloadBat, updateBat } from "../entities/bat";
+import { Bat, createBatAnime, preloadBat, updateBat } from "../entities/bat";
 
 export type Player = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class Game extends Scene {
     control: Control;
     bat: Player;
+    batInfo: Bat;
     platform: Phaser.Physics.Arcade.StaticGroup;
     constructor() {
         super("Game");
+        this.batInfo = {
+            jump: false,
+            jumpCounter: 0,
+        };
     }
 
     preload() {

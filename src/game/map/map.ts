@@ -11,8 +11,8 @@ export const preloadMap = (game: Game) => {
 
 const line00 = "G________________";
 const line01 = "_G_______________";
-const line02 = "__G______________";
-const line03 = "___G_____________";
+const line02 = "_________________";
+const line03 = "_________________";
 const line04 = "_M__G____________";
 const line05 = "GGGGGGGGGGGGGGGGG";
 

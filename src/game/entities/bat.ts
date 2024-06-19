@@ -62,16 +62,18 @@ const jump = (game: Game) => {
 };
 
 export const updateBat = (game: Game) => {
-    const { A, D, W } = game.control;
+    const { A, D, W, J } = game.control;
 
     const { batInfo } = game;
+
+    const ACC = J.isDown ? 1000 : 500;
 
     if (A.isDown) {
         const vel = game.bat.body.velocity.x;
         if (vel >= 0) {
             game.bat.setAccelerationX(-20000);
         } else {
-            if (game.bat.body.touching.down) game.bat.setAccelerationX(-500);
+            if (game.bat.body.touching.down) game.bat.setAccelerationX(-ACC);
             else game.bat.setAccelerationX(-100);
         }
 
@@ -81,7 +83,7 @@ export const updateBat = (game: Game) => {
         if (vel <= 0) {
             game.bat.setAccelerationX(+20000);
         } else {
-            if (game.bat.body.touching.down) game.bat.setAccelerationX(500);
+            if (game.bat.body.touching.down) game.bat.setAccelerationX(ACC);
             else game.bat.setAccelerationX(100);
         }
         game.bat.anims.play(RIGHT, true);

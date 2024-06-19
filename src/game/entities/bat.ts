@@ -1,5 +1,6 @@
 import { Game } from "../scenes/Game";
 
+const BREAK_ACCELERATION = 1000;
 const JUMP_COUNTER_MAX = 50;
 export type Bat = {
     jump: boolean;
@@ -14,7 +15,7 @@ export const preloadBat = (game: Game) => {
 };
 
 export const createBatMap = (game: Game, x: number, y: number) => {
-    game.bat = game.physics.add.sprite(x, y, "cat");
+    game.bat = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
     game.bat.setCollideWorldBounds(true);
 };
 
@@ -28,14 +29,28 @@ export const updateBat = (game: Game) => {
     const { batInfo } = game;
 
     if (A.isDown) {
-        game.bat.setVelocityX(-160);
+        game.bat.setAccelerationX(-500);
         game.bat.anims.play(LEFT, true);
     } else if (D.isDown) {
-        game.bat.setVelocityX(160);
+        game.bat.setAccelerationX(500);
         game.bat.anims.play(RIGHT, true);
     } else {
-        game.bat.setVelocityX(0);
-        game.bat.anims.play(TURN, true);
+        const acceleration = game.bat.body.acceleration.x;
+        const sign = Math.sign(acceleration);
+        const acc = Math.abs(acceleration);
+
+        if (acc === BREAK_ACCELERATION) {
+            const velocity = game.bat.body.velocity.x;
+            if ((sign > 0 && velocity > 0) || (sign < 0 && velocity < 0)) {
+                game.bat.setVelocityX(0);
+                game.bat.setAccelerationX(0);
+            }
+        } else {
+            if (sign < 0) game.bat.setAccelerationX(+BREAK_ACCELERATION);
+            if (sign > 0) game.bat.setAccelerationX(-BREAK_ACCELERATION);
+        }
+
+        if (acc === BREAK_ACCELERATION) game.bat.anims.play(TURN, true);
     }
 
     if (W.isDown && game.bat.body.touching.down) {

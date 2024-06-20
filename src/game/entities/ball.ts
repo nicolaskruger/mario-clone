@@ -6,6 +6,12 @@ export const RIGHT_BALL = "b_right";
 export const LEFT_BALL = "b_left";
 export const DIE_BALL = "b_die";
 
+export type Ball = {
+    id: number;
+    dead: boolean;
+    info: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+};
+
 export const preloadBall = (game: Game) => {
     game.load.spritesheet(SPRITE, "ball.png", {
         frameHeight: 128,
@@ -14,7 +20,11 @@ export const preloadBall = (game: Game) => {
 };
 
 export const createBallM = (game: Game, x: number, y: number) => {
-    const ball = game.physics.add.sprite(x, y, SPRITE);
+    const ball: Ball = {
+        id: Math.random(),
+        dead: false,
+        info: game.physics.add.sprite(x, y, SPRITE),
+    };
     game.balls.push(ball);
 };
 
@@ -43,7 +53,7 @@ export const createBall = (game: Game) => {
             start: 4,
             end: 8,
         }),
-        frameRate: 6,
+        frameRate: 10,
     });
 };
 

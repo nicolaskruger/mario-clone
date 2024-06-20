@@ -53,16 +53,16 @@ export const createMap = (game: Game) => {
     );
     game.physics.add.collider(game.bat, game.platform);
     game.balls.forEach((ball) => {
-        game.physics.add.collider(game.platform, ball);
+        game.physics.add.collider(game.platform, ball.info);
         const collider = game.physics.add.overlap(
             game.bat,
-            ball,
+            ball.info,
             (bat, ball) => {
                 const _bat = bat as Entity;
                 const _ball = ball as Entity;
 
                 const destroyBall = () => {
-                    game.balls = game.balls.filter((b) => b === _ball);
+                    game.balls = game.balls.filter((b) => b.info === _ball);
                     game.physics.world.removeCollider(collider);
                     _ball.anims.play(DIE_BALL);
                 };

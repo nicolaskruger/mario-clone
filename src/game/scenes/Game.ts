@@ -3,11 +3,10 @@ import { EventBus } from "../EventBus";
 import { Control, createControl } from "../controll/control";
 import { createMap, preloadMap } from "../map/map";
 import { Bat, createBatAnime, preloadBat, updateBat } from "../entities/bat";
-import { createBall, preloadBall } from "../entities/ball";
+import { Ball, createBall, preloadBall } from "../entities/ball";
 import { iterateMap } from "../aux/aux";
 
 export type Player = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-export type Ball = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class Game extends Scene {
     control: Control;

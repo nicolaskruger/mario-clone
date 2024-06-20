@@ -1,7 +1,6 @@
 import { DIE_BALL, createBallM } from "../entities/ball";
 import { createBatMap } from "../entities/bat";
 import { Game } from "../scenes/Game";
-import type { Player } from "../scenes/Game";
 const tileSize = 128;
 
 const img = "groung";
@@ -51,11 +50,11 @@ export const createMap = (game: Game) => {
             );
         })
     );
-    game.physics.add.collider(game.bat, game.platform);
+    game.physics.add.collider(game.bat.info, game.platform);
     game.balls.forEach((ball) => {
         game.physics.add.collider(game.platform, ball.info);
         const collider = game.physics.add.overlap(
-            game.bat,
+            game.bat.info,
             ball.info,
             (bat, ball) => {
                 const _bat = bat as Entity;

@@ -6,24 +6,16 @@ import { Bat, createBatAnime, preloadBat, updateBat } from "../entities/bat";
 import { Ball, createBall, preloadBall } from "../entities/ball";
 import { iterateMap } from "../aux/aux";
 
-export type Player = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-
 export class Game extends Scene {
     control: Control;
-    bat: Player;
     balls: Ball[];
-    batInfo: Bat;
+    bat: Bat;
     platform: Phaser.Physics.Arcade.StaticGroup;
     constructor() {
         super("Game");
     }
 
     preload() {
-        this.batInfo = {
-            jump: false,
-            jumpCounter: 0,
-            w: false,
-        };
         this.balls = [];
         this.load.setPath("assets");
         this.load.image("star", "star.png");

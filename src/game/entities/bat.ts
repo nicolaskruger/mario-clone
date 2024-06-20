@@ -1,3 +1,4 @@
+import { Entity } from "../aux/aux";
 import { Game } from "../scenes/Game";
 
 const BREAK_ACCELERATION = 20000;
@@ -6,6 +7,7 @@ export type Bat = {
     jump: boolean;
     jumpCounter: number;
     w: boolean;
+    info: Entity;
 };
 
 export const preloadBat = (game: Game) => {
@@ -13,11 +15,17 @@ export const preloadBat = (game: Game) => {
         frameHeight: 128,
         frameWidth: 128,
     });
+    game.bat = {
+        jump: false,
+        jumpCounter: 0,
+        w: false,
+        info: {} as Entity,
+    };
 };
 
 export const createBatMap = (game: Game, x: number, y: number) => {
-    game.bat = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
-    game.bat.setCollideWorldBounds(true);
+    game.bat.info = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
+    game.bat.info.setCollideWorldBounds(true);
 };
 
 const LEFT = "left";
@@ -25,77 +33,81 @@ const RIGHT = "right";
 const TURN = "turn";
 
 const breakAcceleration = (game: Game) => {
-    const acceleration = game.bat.body.acceleration.x;
+    const acceleration = game.bat.info.body.acceleration.x;
     const sign = Math.sign(acceleration);
     const acc = Math.abs(acceleration);
 
     if (acc === BREAK_ACCELERATION) {
-        const velocity = game.bat.body.velocity.x;
+        const velocity = game.bat.info.body.velocity.x;
         if ((sign > 0 && velocity > 0) || (sign < 0 && velocity < 0)) {
-            game.bat.setVelocityX(0);
-            game.bat.setAccelerationX(0);
+            game.bat.info.setVelocityX(0);
+            game.bat.info.setAccelerationX(0);
         }
     } else {
-        if (sign < 0) game.bat.setAccelerationX(+BREAK_ACCELERATION);
-        if (sign > 0) game.bat.setAccelerationX(-BREAK_ACCELERATION);
+        if (sign < 0) game.bat.info.setAccelerationX(+BREAK_ACCELERATION);
+        if (sign > 0) game.bat.info.setAccelerationX(-BREAK_ACCELERATION);
     }
 
-    if (acc === BREAK_ACCELERATION) game.bat.anims.play(TURN, true);
+    if (acc === BREAK_ACCELERATION) game.bat.info.anims.play(TURN, true);
 };
 
 const jump = (game: Game) => {
     const { W, J } = game.control;
-    const { batInfo } = game;
+    const { bat } = game;
     const mt = J.isDown ? 2 : 1;
-    if (J.isDown) game.bat.setMaxVelocity(800);
-    if (J.isUp) game.bat.setMaxVelocity(700);
+    if (J.isDown) game.bat.info.setMaxVelocity(800);
+    if (J.isUp) game.bat.info.setMaxVelocity(700);
 
-    if (W.isUp) batInfo.w = true;
-    if (W.isDown && game.bat.body.touching.down && batInfo.w) {
-        game.bat.setVelocityY(-10000 * mt);
-        game.bat.setAccelerationX(0);
-        batInfo.jump = true;
-        batInfo.jumpCounter = 0;
-        batInfo.w = false;
+    if (W.isUp) bat.w = true;
+    if (W.isDown && game.bat.info.body.touching.down && bat.w) {
+        game.bat.info.setVelocityY(-10000 * mt);
+        game.bat.info.setAccelerationX(0);
+        bat.jump = true;
+        bat.jumpCounter = 0;
+        bat.w = false;
     }
-    if (batInfo.jump && W.isDown && batInfo.jumpCounter < JUMP_COUNTER_MAX) {
-        batInfo.jumpCounter++;
-    } else if (batInfo.jump) {
+    if (bat.jump && W.isDown && bat.jumpCounter < JUMP_COUNTER_MAX) {
+        bat.jumpCounter++;
+    } else if (bat.jump) {
         const newVelocity =
-            game.bat.body.velocity.y < 0 ? 0 : game.bat.body.velocity.y;
-        game.bat.setVelocityY(newVelocity);
-        batInfo.jump = false;
+            game.bat.info.body.velocity.y < 0
+                ? 0
+                : game.bat.info.body.velocity.y;
+        game.bat.info.setVelocityY(newVelocity);
+        bat.jump = false;
     }
 };
 
 export const updateBat = (game: Game) => {
     const { A, D, W, J } = game.control;
 
-    const { batInfo } = game;
+    const { bat } = game;
 
     const ACC = J.isDown ? 1000 : 500;
 
     if (A.isDown) {
-        const vel = game.bat.body.velocity.x;
+        const vel = game.bat.info.body.velocity.x;
         if (vel >= 0) {
-            game.bat.setAccelerationX(-20000);
+            game.bat.info.setAccelerationX(-20000);
         } else {
-            if (game.bat.body.touching.down) game.bat.setAccelerationX(-ACC);
-            else game.bat.setAccelerationX(-100);
+            if (game.bat.info.body.touching.down)
+                game.bat.info.setAccelerationX(-ACC);
+            else game.bat.info.setAccelerationX(-100);
         }
 
-        game.bat.anims.play(LEFT, true);
+        game.bat.info.anims.play(LEFT, true);
     } else if (D.isDown) {
-        const vel = game.bat.body.velocity.x;
+        const vel = game.bat.info.body.velocity.x;
         if (vel <= 0) {
-            game.bat.setAccelerationX(+20000);
+            game.bat.info.setAccelerationX(+20000);
         } else {
-            if (game.bat.body.touching.down) game.bat.setAccelerationX(ACC);
-            else game.bat.setAccelerationX(100);
+            if (game.bat.info.body.touching.down)
+                game.bat.info.setAccelerationX(ACC);
+            else game.bat.info.setAccelerationX(100);
         }
-        game.bat.anims.play(RIGHT, true);
+        game.bat.info.anims.play(RIGHT, true);
     } else {
-        if (game.bat.body.touching.down) breakAcceleration(game);
+        if (game.bat.info.body.touching.down) breakAcceleration(game);
     }
 
     jump(game);

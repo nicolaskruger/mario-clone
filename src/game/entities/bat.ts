@@ -5,6 +5,7 @@ const JUMP_COUNTER_MAX = 50;
 export type Bat = {
     jump: boolean;
     jumpCounter: number;
+    w: boolean;
 };
 
 export const preloadBat = (game: Game) => {
@@ -43,13 +44,19 @@ const breakAcceleration = (game: Game) => {
 };
 
 const jump = (game: Game) => {
-    const { A, D, W } = game.control;
+    const { W, J } = game.control;
     const { batInfo } = game;
-    if (W.isDown && game.bat.body.touching.down) {
-        game.bat.setVelocityY(-650);
+    const mt = J.isDown ? 2 : 1;
+    if (J.isDown) game.bat.setMaxVelocity(800);
+    if (J.isUp) game.bat.setMaxVelocity(700);
+
+    if (W.isUp) batInfo.w = true;
+    if (W.isDown && game.bat.body.touching.down && batInfo.w) {
+        game.bat.setVelocityY(-10000 * mt);
         game.bat.setAccelerationX(0);
         batInfo.jump = true;
         batInfo.jumpCounter = 0;
+        batInfo.w = false;
     }
     if (batInfo.jump && W.isDown && batInfo.jumpCounter < JUMP_COUNTER_MAX) {
         batInfo.jumpCounter++;

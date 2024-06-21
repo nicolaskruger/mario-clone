@@ -2,7 +2,7 @@ import { Entity } from "../aux/aux";
 import { Collider, ColliderBundle } from "../collider/collider";
 import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";
-import { Bat } from "./bat";
+import { Bat, hit } from "./bat";
 import { createNewFood } from "./food";
 
 const SPRITE = "ball";
@@ -67,7 +67,7 @@ const colideBallPlayer = (game: Game) => {
                     destroyBall();
                     _bat.setVelocityY(-700);
                 } else {
-                    _bat.destroy(true);
+                    hit(game);
                 }
             }
         );

@@ -1,3 +1,4 @@
+import { Tweens } from "phaser";
 import { Entity } from "../aux/aux";
 import { Game } from "../scenes/Game";
 
@@ -12,6 +13,7 @@ export type Bat = {
     info: Entity;
     food: number;
     endiabrado: number;
+    invisible: boolean;
 };
 
 export const preloadBat = (game: Game) => {
@@ -24,6 +26,7 @@ export const preloadBat = (game: Game) => {
         frameHeight: 128,
     });
     game.bat = {
+        invisible: false,
         jump: false,
         jumpCounter: 0,
         w: false,
@@ -219,5 +222,39 @@ function animated(bat: Bat, cat: string, devil: string) {
 export const eat = (bat: Bat) => {
     bat.food++;
     bat.endiabrado += bat.endiabrado >= MAX_ENDIABRADO ? 0 : 1;
+};
+
+export const hit = (game: Game) => {
+    if (game.bat.invisible) return;
+    if (isEndiabrado(game.bat)) {
+        game.bat.invisible = true;
+        game.bat.endiabrado = 0;
+        turn(game.bat);
+        game.bat.info.setVelocityY(-3000);
+        if (game.bat.info.body.touching.left) game.bat.info.setVelocityX(100);
+        if (game.bat.info.body.touching.right) game.bat.info.setVelocityX(-100);
+        const tween = game.tweens.add({
+            targets: game.bat.info,
+            ease: "Power1",
+            duration: 100000000,
+            loop: 10,
+            loopDelay: 100,
+        });
+
+        tween.on("start", () => {
+            game.bat.info.setTintFill(0xffffff);
+        });
+
+        let toggle = true;
+        tween.on("loop", () => {
+            if (toggle) {
+                game.bat.info.setTintFill(0xffffff);
+            } else {
+                game.bat.info.clearTint();
+            }
+            toggle = !toggle;
+        });
+    } else {
+    }
 };
 

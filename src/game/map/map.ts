@@ -1,5 +1,6 @@
 import { DIE_BALL, collideBall, createBallM } from "../entities/ball";
 import { createBatMap } from "../entities/bat";
+import { collideAllFood, createFoodMap } from "../entities/food";
 import { Game } from "../scenes/Game";
 export const tileSize = 128;
 
@@ -12,13 +13,13 @@ export const preloadMap = (game: Game) => {
 const line00 = "G________________";
 const line01 = "_G_______________";
 const line02 = "_________________";
-const line03 = "_________________";
-const line04 = "_M_GB_BG_________";
+const line03 = "______F__________";
+const line04 = "FMFGBFBGF________";
 const line05 = "GGGGGGGGGGGGGGGGG";
 
 const map = [line00, line01, line02, line03, line04, line05];
 
-type ObjNickName = "M" | "G" | "_" | "B";
+type ObjNickName = "M" | "G" | "_" | "B" | "F";
 
 export type EDictionary<T extends string | symbol | number, U> = {
     [K in T]: U;
@@ -34,6 +35,7 @@ const creator: EDictionary<
     _: () => {},
     M: createBatMap,
     B: createBallM,
+    F: createFoodMap,
 };
 
 export const createMap = (game: Game) => {
@@ -50,5 +52,6 @@ export const createMap = (game: Game) => {
     );
     game.physics.add.collider(game.bat.info, game.platform);
     collideBall(game);
+    collideAllFood(game);
 };
 

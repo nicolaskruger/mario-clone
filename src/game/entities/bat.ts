@@ -3,11 +3,14 @@ import { Game } from "../scenes/Game";
 
 const BREAK_ACCELERATION = 20000;
 const JUMP_COUNTER_MAX = 50;
+const MAX_ENDIABRADO = 20;
 export type Bat = {
     jump: boolean;
     jumpCounter: number;
     w: boolean;
     info: Entity;
+    food: number;
+    endiabrado: number;
 };
 
 export const preloadBat = (game: Game) => {
@@ -20,6 +23,8 @@ export const preloadBat = (game: Game) => {
         jumpCounter: 0,
         w: false,
         info: {} as Entity,
+        food: 0,
+        endiabrado: 0,
     };
 };
 
@@ -144,5 +149,10 @@ export const createBatAnime = (game: Game) => {
         frameRate: 4,
         repeat: -1,
     });
+};
+
+export const eat = (bat: Bat) => {
+    bat.food++;
+    bat.endiabrado += bat.endiabrado >= MAX_ENDIABRADO ? 0 : 1;
 };
 

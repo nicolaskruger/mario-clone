@@ -2,6 +2,7 @@ import { Entity } from "../aux/aux";
 import { Collider, ColliderBundle } from "../collider/collider";
 import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";
+import { Bat } from "./bat";
 
 const SPRITE = "ball";
 

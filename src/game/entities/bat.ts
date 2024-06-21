@@ -4,6 +4,7 @@ import { Game } from "../scenes/Game";
 const BREAK_ACCELERATION = 20000;
 const JUMP_COUNTER_MAX = 50;
 const MAX_ENDIABRADO = 20;
+const DEVIL = "devil";
 export type Bat = {
     jump: boolean;
     jumpCounter: number;
@@ -17,6 +18,10 @@ export const preloadBat = (game: Game) => {
     game.load.spritesheet("cat", "cat.png", {
         frameHeight: 128,
         frameWidth: 128,
+    });
+    game.load.spritesheet(DEVIL, "devil.png", {
+        frameWidth: 128,
+        frameHeight: 128,
     });
     game.bat = {
         jump: false,
@@ -37,6 +42,14 @@ const LEFT = "left";
 const RIGHT = "right";
 const TURN = "turn";
 
+const DEVIL_LEFT = "left_devil";
+const DEVIL_RIGHT = "right_devil";
+const DEVIL_TURN = "turn_devil";
+
+function turn(bat: Bat) {
+    animated(bat, TURN, DEVIL_TURN);
+}
+
 const breakAcceleration = (game: Game) => {
     const acceleration = game.bat.info.body.acceleration.x;
     const sign = Math.sign(acceleration);
@@ -53,7 +66,7 @@ const breakAcceleration = (game: Game) => {
         if (sign > 0) game.bat.info.setAccelerationX(-BREAK_ACCELERATION);
     }
 
-    if (acc === BREAK_ACCELERATION) game.bat.info.anims.play(TURN, true);
+    if (acc === BREAK_ACCELERATION) turn(game.bat);
 };
 
 const jump = (game: Game) => {
@@ -83,6 +96,14 @@ const jump = (game: Game) => {
     }
 };
 
+function left(bat: Bat) {
+    animated(bat, LEFT, DEVIL_LEFT);
+}
+
+function right(bat: Bat) {
+    animated(bat, RIGHT, DEVIL_RIGHT);
+}
+
 export const updateBat = (game: Game) => {
     const { A, D, W, J } = game.control;
 
@@ -100,7 +121,7 @@ export const updateBat = (game: Game) => {
             else game.bat.info.setAccelerationX(-100);
         }
 
-        game.bat.info.anims.play(LEFT, true);
+        left(game.bat);
     } else if (D.isDown) {
         const vel = game.bat.info.body.velocity.x;
         if (vel <= 0) {
@@ -110,7 +131,7 @@ export const updateBat = (game: Game) => {
                 game.bat.info.setAccelerationX(ACC);
             else game.bat.info.setAccelerationX(100);
         }
-        game.bat.info.anims.play(RIGHT, true);
+        right(game.bat);
     } else {
         if (game.bat.info.body.touching.down) breakAcceleration(game);
     }
@@ -120,7 +141,7 @@ export const updateBat = (game: Game) => {
 
 export const createBatAnime = (game: Game) => {
     game.anims.create({
-        key: "left",
+        key: LEFT,
         frames: game.anims.generateFrameNumbers("cat", {
             start: 5,
             end: 6,
@@ -130,7 +151,7 @@ export const createBatAnime = (game: Game) => {
     });
 
     game.anims.create({
-        key: "turn",
+        key: TURN,
         frames: game.anims.generateFrameNumbers("cat", {
             start: 0,
             end: 2,
@@ -141,7 +162,7 @@ export const createBatAnime = (game: Game) => {
     });
 
     game.anims.create({
-        key: "right",
+        key: RIGHT,
         frames: game.anims.generateFrameNumbers("cat", {
             start: 3,
             end: 4,
@@ -149,7 +170,51 @@ export const createBatAnime = (game: Game) => {
         frameRate: 4,
         repeat: -1,
     });
+
+    game.anims.create({
+        key: DEVIL_LEFT,
+        frames: game.anims.generateFrameNumbers(DEVIL, {
+            start: 5,
+            end: 6,
+        }),
+        repeat: -1,
+        frameRate: 4,
+    });
+
+    game.anims.create({
+        key: DEVIL_TURN,
+        frames: game.anims.generateFrameNumbers(DEVIL, {
+            start: 0,
+            end: 2,
+        }),
+
+        frameRate: 3,
+        repeat: -1,
+    });
+
+    game.anims.create({
+        key: DEVIL_RIGHT,
+        frames: game.anims.generateFrameNumbers(DEVIL, {
+            start: 3,
+            end: 4,
+        }),
+        frameRate: 4,
+        repeat: -1,
+    });
 };
+
+export const eatNip = (bat: Bat) => {
+    bat.endiabrado = MAX_ENDIABRADO;
+    bat.info.setTexture(DEVIL);
+};
+
+function isEndiabrado(bat: Bat) {
+    return bat.endiabrado === MAX_ENDIABRADO;
+}
+
+function animated(bat: Bat, cat: string, devil: string) {
+    bat.info.anims.play(isEndiabrado(bat) ? devil : cat, true);
+}
 
 export const eat = (bat: Bat) => {
     bat.food++;

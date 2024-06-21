@@ -1,4 +1,4 @@
-import { eat } from "./bat";
+import { eat, eatNip } from "./bat";
 import { Collectable, collectableFactory } from "./colectable";
 
 export type Nip = Collectable;
@@ -12,7 +12,7 @@ const { collideAll, create, createMap, createNew, preload } =
         13,
         ({ nips }) => nips,
         (game, list) => (game.nips = list),
-        eat
+        eatNip
     );
 
 export const preloadNip = preload;

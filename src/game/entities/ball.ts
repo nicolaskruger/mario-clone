@@ -3,6 +3,7 @@ import { Collider, ColliderBundle } from "../collider/collider";
 import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";
 import { Bat } from "./bat";
+import { createNewFood } from "./food";
 
 const SPRITE = "ball";
 
@@ -59,6 +60,7 @@ const colideBallPlayer = (game: Game) => {
                 const destroyBall = () => {
                     game.physics.world.removeCollider(collider);
                     killBall(ball);
+                    createNewFood(game, ball.info.x, ball.info.y);
                 };
 
                 if (_bat.y < _ball.y - tileSize / 2) {

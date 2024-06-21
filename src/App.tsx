@@ -1,9 +1,13 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IRefPhaserGame, PhaserGame } from "./game/PhaserGame";
+import { Game } from "./game/scenes/Game";
 
 function App() {
     //  References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef<IRefPhaserGame | null>(null);
+
+    const [food, setFood] = useState(0);
+    const [endiabrado, setEndiabrado] = useState(0);
 
     const addSprite = () => {
         if (phaserRef.current) {
@@ -20,14 +24,24 @@ function App() {
         }
     };
 
+    useEffect(() => {
+        const func = setInterval(() => {
+            const game = phaserRef.current?.scene;
+            if (game instanceof Game) {
+                setFood(game.bat.food);
+                setEndiabrado(game.bat.endiabrado);
+            }
+        }, 200);
+        return () => clearInterval(func);
+    }, []);
+
     return (
         <div id="app">
             <PhaserGame ref={phaserRef} />
             <div>
                 <div>
-                    <button className="button" onClick={addSprite}>
-                        Add New Sprite
-                    </button>
+                    <button className="button">{food}</button>
+                    <button className="button">{endiabrado}</button>
                 </div>
             </div>
         </div>

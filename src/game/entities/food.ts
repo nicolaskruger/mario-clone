@@ -60,3 +60,10 @@ export const collideAllFood = (game: Game) => {
     });
 };
 
+export const createNewFood = (game: Game, x: number, y: number) => {
+    const info = game.physics.add.sprite(x, y, SPRITE).setDepth(-1);
+    const food: Food = { info, id: Math.random() };
+    game.foods.push(food);
+    info.anims.play(FLOAT);
+    collideFood(game, food);
+};

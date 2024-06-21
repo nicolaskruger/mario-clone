@@ -11,6 +11,10 @@ export const collectableFactory = (
     image: string,
     SPRITE: string,
     radio: number,
+    frames: number,
+    frameRate: number,
+    get: (game: Game) => Collectable[],
+    set: (Game: Game, coll: Collectable[]) => void,
     eat: (bat: Bat) => void
 ) => {
     const preload = (game: Game) => {
@@ -18,13 +22,13 @@ export const collectableFactory = (
             frameHeight: 128,
             frameWidth: 128,
         });
-        game.foods = [];
+        set(game, []);
     };
     const FLOAT = "float" + SPRITE;
 
     const createMap = (game: Game, x: number, y: number) => {
         const info = game.physics.add.sprite(x, y, SPRITE).setDepth(-1);
-        game.foods.push({ info, id: Math.random() });
+        get(game).push({ info, id: Math.random() });
         info.anims.play(FLOAT);
     };
 
@@ -33,22 +37,25 @@ export const collectableFactory = (
             key: FLOAT,
             frames: game.anims.generateFrameNumbers(SPRITE, {
                 start: 0,
-                end: 1,
+                end: frames - 1,
             }),
             repeat: -1,
-            frameRate: 4,
+            frameRate,
         });
     };
 
-    const collideGround = (game: Game, food: Collectable) =>
-        game.physics.add.collider(food.info, game.platform);
+    const collideGround = (game: Game, collectable: Collectable) =>
+        game.physics.add.collider(collectable.info, game.platform);
 
-    const collidePlayer = (game: Game, food: Collectable) => {
+    const collidePlayer = (game: Game, collectable: Collectable) => {
         const battI = game.bat.info;
-        const foodI = food.info;
+        const foodI = collectable.info;
         game.physics.add.overlap(battI, foodI, () => {
             if (distance(battI, foodI) >= radio) return;
-            game.foods = game.foods.filter((f) => f.id !== food.id);
+            set(
+                game,
+                get(game).filter((f) => f.id !== collectable.id)
+            );
             foodI.destroy();
             eat(game.bat);
         });
@@ -59,7 +66,7 @@ export const collectableFactory = (
     };
 
     const collideAll = (game: Game) => {
-        game.foods.forEach((f) => {
+        get(game).forEach((f) => {
             collide(game, f);
         });
     };
@@ -67,7 +74,7 @@ export const collectableFactory = (
     const createNew = (game: Game, x: number, y: number) => {
         const info = game.physics.add.sprite(x, y, SPRITE).setDepth(-1);
         const food: Collectable = { info, id: Math.random() };
-        game.foods.push(food);
+        get(game).push(food);
         info.anims.play(FLOAT);
         collide(game, food);
     };

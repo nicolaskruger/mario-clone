@@ -3,7 +3,7 @@ import { EventBus } from "../EventBus";
 import { Control, createControl } from "../controll/control";
 import { createMap, preloadMap } from "../map/map";
 import { Bat, createBatAnime, preloadBat, updateBat } from "../entities/bat";
-import { Ball, createBall, preloadBall } from "../entities/ball";
+import { Ball, createBall, preloadBall, updateBall } from "../entities/ball";
 import { iterateMap } from "../aux/aux";
 
 export class Game extends Scene {
@@ -24,7 +24,7 @@ export class Game extends Scene {
         iterateMap(this, preloadMap, preloadBat, preloadBall);
     }
     update(time: number, delta: number): void {
-        updateBat(this);
+        iterateMap(this, updateBat, updateBall);
     }
 
     create() {

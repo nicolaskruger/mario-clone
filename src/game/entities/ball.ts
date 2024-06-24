@@ -32,6 +32,7 @@ export const createBallM = (game: Game, x: number, y: number) => {
         info: game.physics.add.sprite(x, y, SPRITE),
         colliders: [],
     };
+    ball.info.setDepth(2);
     game.balls.push(ball);
 };
 

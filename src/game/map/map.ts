@@ -42,7 +42,7 @@ const creator: EDictionary<
 };
 
 export const createMap = (game: Game) => {
-    game.platform = game.physics.add.staticGroup();
+    game.platform = game.physics.add.staticGroup().setDepth(-1000000);
 
     map.forEach((line, y) =>
         line.split("").forEach((v, x) => {
@@ -53,7 +53,10 @@ export const createMap = (game: Game) => {
             );
         })
     );
-    game.physics.add.collider(game.bat.info, game.platform);
+    game.bat.collideGround = game.physics.add.collider(
+        game.bat.info,
+        game.platform
+    );
 
     iterateMap(game, collideBall, collideAllFood, collideAllNip);
 };

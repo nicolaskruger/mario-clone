@@ -1,5 +1,5 @@
-import { Tweens } from "phaser";
 import { Entity } from "../aux/aux";
+import { Collider } from "../collider/collider";
 import { Game } from "../scenes/Game";
 
 const BREAK_ACCELERATION = 20000;
@@ -14,6 +14,8 @@ export type Bat = {
     food: number;
     endiabrado: number;
     invisible: boolean;
+    dead: boolean;
+    collideGround?: Collider;
 };
 
 export const preloadBat = (game: Game) => {
@@ -33,12 +35,13 @@ export const preloadBat = (game: Game) => {
         info: {} as Entity,
         food: 0,
         endiabrado: 0,
+        dead: false,
     };
 };
 
 export const createBatMap = (game: Game, x: number, y: number) => {
     game.bat.info = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
-    game.bat.info.setCollideWorldBounds(true);
+    game.bat.info.setDepth(1);
 };
 
 const LEFT = "left";
@@ -111,6 +114,8 @@ export const updateBat = (game: Game) => {
     const { A, D, W, J } = game.control;
 
     const { bat } = game;
+
+    if (bat.dead) return;
 
     const ACC = J.isDown ? 1000 : 500;
 
@@ -224,37 +229,54 @@ export const eat = (bat: Bat) => {
     bat.endiabrado += bat.endiabrado >= MAX_ENDIABRADO ? 0 : 1;
 };
 
+const hitEndiabrado = (game: Game) => {
+    game.bat.invisible = true;
+    game.bat.endiabrado = 0;
+    turn(game.bat);
+    game.bat.info.setVelocityY(-3000);
+    if (game.bat.info.body.touching.left) game.bat.info.setVelocityX(100);
+    if (game.bat.info.body.touching.right) game.bat.info.setVelocityX(-100);
+    const tween = game.tweens.add({
+        targets: game.bat.info,
+        ease: "Power1",
+        duration: 100000000,
+        loop: 10,
+        loopDelay: 100,
+    });
+
+    tween.on("start", () => {
+        game.bat.info.setTintFill(0xffffff);
+    });
+
+    let toggle = true;
+    tween.on("loop", () => {
+        if (toggle) {
+            game.bat.info.setTintFill(0xffffff);
+        } else {
+            game.bat.info.clearTint();
+        }
+        toggle = !toggle;
+    });
+    tween.on("complete", () => {
+        game.bat.invisible = false;
+    });
+};
+
+const gameOver = (game: Game) => {
+    const { bat } = game;
+    bat.dead = true;
+    bat.info.setVelocityX(0);
+    bat.info.setVelocityY(-400);
+    turn(bat);
+    if (bat.collideGround) {
+        bat.collideGround.destroy();
+        delete bat.collideGround;
+    }
+};
+
 export const hit = (game: Game) => {
     if (game.bat.invisible) return;
-    if (isEndiabrado(game.bat)) {
-        game.bat.invisible = true;
-        game.bat.endiabrado = 0;
-        turn(game.bat);
-        game.bat.info.setVelocityY(-3000);
-        if (game.bat.info.body.touching.left) game.bat.info.setVelocityX(100);
-        if (game.bat.info.body.touching.right) game.bat.info.setVelocityX(-100);
-        const tween = game.tweens.add({
-            targets: game.bat.info,
-            ease: "Power1",
-            duration: 100000000,
-            loop: 10,
-            loopDelay: 100,
-        });
-
-        tween.on("start", () => {
-            game.bat.info.setTintFill(0xffffff);
-        });
-
-        let toggle = true;
-        tween.on("loop", () => {
-            if (toggle) {
-                game.bat.info.setTintFill(0xffffff);
-            } else {
-                game.bat.info.clearTint();
-            }
-            toggle = !toggle;
-        });
-    } else {
-    }
+    if (isEndiabrado(game.bat)) hitEndiabrado(game);
+    else gameOver(game);
 };
 

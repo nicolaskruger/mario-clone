@@ -1,5 +1,5 @@
 import { iterateMap } from "../aux/aux";
-import { DIE_BALL, collideBall, createBallM } from "../entities/ball";
+import { collideBall, createBallM } from "../entities/ball";
 import { createBatMap } from "../entities/bat";
 import { collideAllFood, createFoodMap } from "../entities/food";
 import { collideAllNip, createNipMap } from "../entities/nip";

@@ -10,3 +10,42 @@ export const distance = (entity0: Entity, entity1: Entity) =>
 
 export type Entity = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
+export type Body = { x: number; y: number; width: number; height: number };
+
+const generateBody = ({ x, y, width, height }: Body): Body => ({
+    width,
+    height,
+    x: x - width / 2,
+    y: y - height / 2,
+});
+
+const intersectPoints = (...num: number[]): boolean => {
+    const [a, b, c, d] = num;
+
+    num.sort((a, b) => a - b);
+
+    return !(
+        JSON.stringify([a, b, c, d]) === JSON.stringify(num) ||
+        JSON.stringify([c, d, a, b]) === JSON.stringify(num)
+    );
+};
+
+export const isColliding = (a: Body, b: Body) => {
+    const bodyA = generateBody(a);
+    const bodyB = generateBody(b);
+    return (
+        intersectPoints(
+            bodyA.x,
+            bodyA.x + bodyA.width,
+            bodyB.x,
+            bodyB.x + bodyB.width
+        ) &&
+        intersectPoints(
+            bodyA.y,
+            bodyA.y + bodyA.height,
+            bodyB.y,
+            bodyB.y + bodyB.height
+        )
+    );
+};
+

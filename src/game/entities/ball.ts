@@ -4,6 +4,7 @@ import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";
 import { Bat, hit } from "./bat";
 import { createNewFood } from "./food";
+import { createNewNip } from "./nip";
 
 const SPRITE = "ball";
 
@@ -15,6 +16,7 @@ export type Ball = {
     id: number;
     dead: boolean;
     info: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    colliderPlayer: Collider;
     colliders: ColliderBundle[];
 };
 
@@ -31,12 +33,13 @@ export const createBallM = (game: Game, x: number, y: number) => {
         dead: false,
         info: game.physics.add.sprite(x, y, SPRITE),
         colliders: [],
+        colliderPlayer: {} as Collider,
     };
     ball.info.setDepth(2);
     game.balls.push(ball);
 };
 
-const killBall = (ball: Ball) => {
+export const killBall = (ball: Ball) => {
     ball.info.anims.play(DIE_BALL);
     ball.dead = true;
     ball.info.setVelocity(0);
@@ -48,25 +51,27 @@ const killBall = (ball: Ball) => {
         });
 };
 
+export const destroyBall = (game: Game, ball: Ball) => {
+    game.physics.world.removeCollider(ball.colliderPlayer);
+    killBall(ball);
+    if (ball.dead) return;
+    if (Math.random() > 0.9) createNewNip(game, ball.info.x, ball.info.y);
+    else createNewFood(game, ball.info.x, ball.info.y);
+};
+
 const colideBallPlayer = (game: Game) => {
     game.balls.forEach((ball) => {
         game.physics.add.collider(game.platform, ball.info);
-        const collider = game.physics.add.overlap(
+
+        ball.colliderPlayer = game.physics.add.overlap(
             game.bat.info,
             ball.info,
-            (bat, sBall) => {
-                const _bat = bat as Entity;
-                const _ball = sBall as Entity;
+            (_bat, sBall) => {
+                const bat = game.bat.info;
 
-                const destroyBall = () => {
-                    game.physics.world.removeCollider(collider);
-                    killBall(ball);
-                    createNewFood(game, ball.info.x, ball.info.y);
-                };
-
-                if (_bat.y < _ball.y - tileSize / 2) {
-                    destroyBall();
-                    _bat.setVelocityY(-700);
+                if (bat.y < ball.info.y - tileSize / 2) {
+                    destroyBall(game, ball);
+                    bat.setVelocityY(-700);
                 } else {
                     hit(game);
                 }

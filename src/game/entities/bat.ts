@@ -1,6 +1,7 @@
-import { Entity } from "../aux/aux";
+import { Entity, isColliding } from "../aux/aux";
 import { Collider } from "../collider/collider";
 import { Game } from "../scenes/Game";
+import { destroyBall } from "./ball";
 
 const BREAK_ACCELERATION = 20000;
 const JUMP_COUNTER_MAX = 50;
@@ -16,7 +17,13 @@ export type Bat = {
     invisible: boolean;
     dead: boolean;
     collideGround?: Collider;
+    direction: "left" | "right";
+    miauCoolDown: boolean;
+    miau: Phaser.Types.Physics.Arcade.SpriteWithStaticBody;
+    miauActive: boolean;
 };
+
+const MIAU = "miau";
 
 export const preloadBat = (game: Game) => {
     game.load.spritesheet("cat", "cat.png", {
@@ -24,6 +31,11 @@ export const preloadBat = (game: Game) => {
         frameWidth: 128,
     });
     game.load.spritesheet(DEVIL, "devil.png", {
+        frameWidth: 128,
+        frameHeight: 128,
+    });
+
+    game.load.spritesheet(MIAU, "miau.png", {
         frameWidth: 128,
         frameHeight: 128,
     });
@@ -36,11 +48,16 @@ export const preloadBat = (game: Game) => {
         food: 0,
         endiabrado: 0,
         dead: false,
+        direction: "right",
+        miauCoolDown: false,
+        miau: {} as Phaser.Types.Physics.Arcade.SpriteWithStaticBody,
+        miauActive: false,
     };
 };
 
 export const createBatMap = (game: Game, x: number, y: number) => {
     game.bat.info = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
+    game.bat.miau = game.physics.add.staticSprite(x + 128, y, MIAU);
     game.bat.info.setDepth(1);
 };
 
@@ -111,7 +128,7 @@ function right(bat: Bat) {
 }
 
 export const updateBat = (game: Game) => {
-    const { A, D, W, J } = game.control;
+    const { A, D, J, K } = game.control;
 
     const { bat } = game;
 
@@ -119,7 +136,33 @@ export const updateBat = (game: Game) => {
 
     const ACC = J.isDown ? 1000 : 500;
 
+    if (bat.direction === "right") {
+        bat.miau.setX(bat.info.x + 128);
+        bat.miau.setY(bat.info.y);
+        bat.miau.setFlipX(false);
+    } else if (bat.direction === "left") {
+        bat.miau.setX(bat.info.x - 128);
+        bat.miau.setY(bat.info.y);
+        bat.miau.setFlipX(true);
+    }
+
+    if (K.isDown && !bat.miauCoolDown && isEndiabrado(bat)) {
+        bat.miauActive = true;
+        bat.miauCoolDown = true;
+        game.balls
+            .filter(({ info }) => isColliding(bat.miau, info))
+            .forEach((ball) => {
+                destroyBall(game, ball);
+            });
+        bat.miau.play(MIAU).on("animationcomplete", () => {
+            bat.miauActive = false;
+            setTimeout(() => (bat.miauCoolDown = false), 500);
+        });
+        return;
+    }
+
     if (A.isDown) {
+        bat.direction = "left";
         const vel = game.bat.info.body.velocity.x;
         if (vel >= 0) {
             game.bat.info.setAccelerationX(-20000);
@@ -131,6 +174,7 @@ export const updateBat = (game: Game) => {
 
         left(game.bat);
     } else if (D.isDown) {
+        bat.direction = "right";
         const vel = game.bat.info.body.velocity.x;
         if (vel <= 0) {
             game.bat.info.setAccelerationX(+20000);
@@ -208,6 +252,12 @@ export const createBatAnime = (game: Game) => {
         }),
         frameRate: 4,
         repeat: -1,
+    });
+
+    game.anims.create({
+        key: MIAU,
+        frames: game.anims.generateFrameNumbers(MIAU),
+        frameRate: 60,
     });
 };
 

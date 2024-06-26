@@ -2,6 +2,7 @@ import { iterateMap } from "../aux/aux";
 import { collideBall, createBallM } from "../entities/ball";
 import { createBatMap } from "../entities/bat";
 import { collideAllFood, createFoodMap } from "../entities/food";
+import { collideJett, createJettMap } from "../entities/jett";
 import { collideAllNip, createNipMap } from "../entities/nip";
 import { Game } from "../scenes/Game";
 export const tileSize = 128;
@@ -12,16 +13,16 @@ export const preloadMap = (game: Game) => {
     game.load.image(img, "ground.png");
 };
 
-const line00 = "G________________";
-const line01 = "_G_______________";
+const line00 = "_______J_________";
+const line01 = "_______G_________";
 const line02 = "_________________";
-const line03 = "______FN_________";
-const line04 = "FMFGBFBGF________";
+const line03 = "__G___FN_________";
+const line04 = "_MN______________";
 const line05 = "GGGGGGGGGGGGGGGGG";
 
 const map = [line00, line01, line02, line03, line04, line05];
 
-type ObjNickName = "M" | "G" | "_" | "B" | "F" | "N";
+type ObjNickName = "M" | "G" | "_" | "B" | "F" | "N" | "J";
 
 export type EDictionary<T extends string | symbol | number, U> = {
     [K in T]: U;
@@ -39,6 +40,7 @@ const creator: EDictionary<
     B: createBallM,
     F: createFoodMap,
     N: createNipMap,
+    J: createJettMap,
 };
 
 export const createMap = (game: Game) => {
@@ -57,7 +59,8 @@ export const createMap = (game: Game) => {
         game.bat.info,
         game.platform
     );
+    game.bat.info.setCollideWorldBounds(true);
 
-    iterateMap(game, collideBall, collideAllFood, collideAllNip);
+    iterateMap(game, collideBall, collideAllFood, collideAllNip, collideJett);
 };
 

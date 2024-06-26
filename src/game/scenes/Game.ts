@@ -7,6 +7,7 @@ import { Ball, createBall, preloadBall, updateBall } from "../entities/ball";
 import { iterateMap } from "../aux/aux";
 import { Food, createFood, preloadFood } from "../entities/food";
 import { Nip, createNip, preloadNip } from "../entities/nip";
+import { Jett, createJett, preloadJett, updateJett } from "../entities/jett";
 
 export class Game extends Scene {
     control: Control;
@@ -14,6 +15,7 @@ export class Game extends Scene {
     foods: Food[];
     nips: Nip[];
     bat: Bat;
+    jett: Jett;
     platform: Phaser.Physics.Arcade.StaticGroup;
     constructor() {
         super("Game");
@@ -31,11 +33,12 @@ export class Game extends Scene {
             preloadBat,
             preloadBall,
             preloadFood,
-            preloadNip
+            preloadNip,
+            preloadJett
         );
     }
     update(time: number, delta: number): void {
-        iterateMap(this, updateBat, updateBall);
+        iterateMap(this, updateBat, updateBall, updateJett);
     }
 
     create() {
@@ -49,6 +52,7 @@ export class Game extends Scene {
             createBall,
             createFood,
             createNip,
+            createJett,
             createMap
         );
 

@@ -39,9 +39,38 @@ export const createBallM = (game: Game, x: number, y: number) => {
     game.balls.push(ball);
 };
 
+function collideNewBall(ball: Ball, game: Game) {
+    game.balls
+        .filter(({ dead }) => !dead)
+        .forEach((bBall) => {
+            const collider = game.physics.add.collider(ball.info, bBall.info);
+            const bundle: ColliderBundle = {
+                collider,
+                active: true,
+            };
+            ball.colliders.push(bundle);
+            bBall.colliders.push(bundle);
+        });
+}
+
+export function createNewBall(game: Game, x: number, y: number, vel: number) {
+    const ball: Ball = {
+        id: Math.random(),
+        dead: false,
+        info: game.physics.add.sprite(x, y, SPRITE),
+        colliders: [],
+        colliderPlayer: {} as Collider,
+    };
+    ball.info.setDepth(2);
+    colideBallPlayer(ball, game);
+    collideNewBall(ball, game);
+    goLeft(ball);
+    ball.info.setVelocity(-vel);
+    game.balls.push(ball);
+}
+
 export const killBall = (ball: Ball) => {
     ball.info.anims.play(DIE_BALL);
-    ball.dead = true;
     ball.info.setVelocity(0);
     ball.colliders
         .filter(({ active }) => active)
@@ -53,30 +82,35 @@ export const killBall = (ball: Ball) => {
 
 export const destroyBall = (game: Game, ball: Ball) => {
     game.physics.world.removeCollider(ball.colliderPlayer);
-    killBall(ball);
     if (ball.dead) return;
-    if (Math.random() > 0.9) createNewNip(game, ball.info.x, ball.info.y);
+    killBall(ball);
+    if (Math.random() > 0.75) createNewNip(game, ball.info.x, ball.info.y);
     else createNewFood(game, ball.info.x, ball.info.y);
+    ball.dead = true;
 };
 
-const colideBallPlayer = (game: Game) => {
-    game.balls.forEach((ball) => {
-        game.physics.add.collider(game.platform, ball.info);
+function colideBallPlayer(ball: Ball, game: Game) {
+    game.physics.add.collider(game.platform, ball.info);
 
-        ball.colliderPlayer = game.physics.add.overlap(
-            game.bat.info,
-            ball.info,
-            (_bat, sBall) => {
-                const bat = game.bat.info;
+    ball.colliderPlayer = game.physics.add.overlap(
+        game.bat.info,
+        ball.info,
+        () => {
+            const bat = game.bat.info;
 
-                if (bat.y < ball.info.y - tileSize / 2) {
-                    destroyBall(game, ball);
-                    bat.setVelocityY(-700);
-                } else {
-                    hit(game);
-                }
+            if (bat.y < ball.info.y - tileSize / 2) {
+                destroyBall(game, ball);
+                bat.setVelocityY(-700);
+            } else {
+                hit(game);
             }
-        );
+        }
+    );
+}
+
+const colideAllBallPlayer = (game: Game) => {
+    game.balls.forEach((ball) => {
+        colideBallPlayer(ball, game);
     });
 };
 
@@ -98,7 +132,7 @@ const collideBallBall = (game: Game) => {
 };
 
 export const collideBall = (game: Game) => {
-    colideBallPlayer(game);
+    colideAllBallPlayer(game);
     collideBallBall(game);
 };
 

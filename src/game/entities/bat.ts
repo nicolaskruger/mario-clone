@@ -2,11 +2,13 @@ import { Entity, isColliding } from "../aux/aux";
 import { Collider } from "../collider/collider";
 import { Game } from "../scenes/Game";
 import { destroyBall } from "./ball";
+import { hitJett } from "./jett";
 
 const BREAK_ACCELERATION = 20000;
 const JUMP_COUNTER_MAX = 50;
 const MAX_ENDIABRADO = 20;
 const DEVIL = "devil";
+const MAX_VEL = 1000;
 export type Bat = {
     jump: boolean;
     jumpCounter: number;
@@ -56,7 +58,9 @@ export const preloadBat = (game: Game) => {
 };
 
 export const createBatMap = (game: Game, x: number, y: number) => {
-    game.bat.info = game.physics.add.sprite(x, y, "cat").setMaxVelocity(700);
+    game.bat.info = game.physics.add
+        .sprite(x, y, "cat")
+        .setMaxVelocity(MAX_VEL);
     game.bat.miau = game.physics.add.staticSprite(x + 128, y, MIAU);
     game.bat.info.setDepth(1);
 };
@@ -96,8 +100,8 @@ const jump = (game: Game) => {
     const { W, J } = game.control;
     const { bat } = game;
     const mt = J.isDown ? 2 : 1;
-    if (J.isDown) game.bat.info.setMaxVelocity(800);
-    if (J.isUp) game.bat.info.setMaxVelocity(700);
+    if (J.isDown) game.bat.info.setMaxVelocity(MAX_VEL);
+    if (J.isUp) game.bat.info.setMaxVelocity(MAX_VEL);
 
     if (W.isUp) bat.w = true;
     if (W.isDown && game.bat.info.body.touching.down && bat.w) {
@@ -145,20 +149,26 @@ export const updateBat = (game: Game) => {
         bat.miau.setY(bat.info.y);
         bat.miau.setFlipX(true);
     }
-
     if (K.isDown && !bat.miauCoolDown && isEndiabrado(bat)) {
         bat.miauActive = true;
         bat.miauCoolDown = true;
-        game.balls
-            .filter(({ info }) => isColliding(bat.miau, info))
-            .forEach((ball) => {
-                destroyBall(game, ball);
-            });
+
         bat.miau.play(MIAU).on("animationcomplete", () => {
             bat.miauActive = false;
             setTimeout(() => (bat.miauCoolDown = false), 500);
         });
         return;
+    }
+
+    if (bat.miauActive) {
+        game.balls
+            .filter(({ info }) => isColliding(bat.miau, info))
+            .forEach((ball) => {
+                destroyBall(game, ball);
+            });
+        if (isColliding(game.jett.info, bat.miau)) {
+            hitJett(game);
+        }
     }
 
     if (A.isDown) {
@@ -315,13 +325,20 @@ const hitEndiabrado = (game: Game) => {
 const gameOver = (game: Game) => {
     const { bat } = game;
     bat.dead = true;
+    bat.info.setAcceleration(0);
     bat.info.setVelocityX(0);
     bat.info.setVelocityY(-400);
+    bat.info.setCollideWorldBounds(false);
     turn(bat);
     if (bat.collideGround) {
         bat.collideGround.destroy();
         delete bat.collideGround;
     }
+    if (game.jett.colliderPlayer) {
+        game.jett.colliderPlayer.destroy();
+        delete game.jett.colliderPlayer;
+    }
+    game.balls.forEach((b) => b.colliderPlayer.destroy());
 };
 
 export const hit = (game: Game) => {

@@ -1,0 +1,19 @@
+.div{
+    position: relative;
+}
+
+.div_div{
+    position: absolute;
+    display: flex;
+    margin-left: 10px;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+.span{
+    font-size: 18px;
+}
+
+.endiabrado {
+    color: tomato;
+}

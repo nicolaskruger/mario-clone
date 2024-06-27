@@ -139,7 +139,7 @@ function followPlayer(game: Game) {
     if (x > halfWorld && x < game.physics.world.bounds.width - halfWorld)
         game.cameras.main.scrollX = x - halfWorld;
     else if (x <= halfWorld) game.cameras.main.scrollX = 0;
-    else if (x >= game.physics.world.bounds.width - halfWorld) {
+    else if (x >= game.physics.world.bounds.width - WORLD_WIDTH) {
         game.cameras.main.scrollX =
             game.physics.world.bounds.width - WORLD_WIDTH;
         game.physics.world.bounds.x =

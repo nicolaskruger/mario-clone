@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import styles from "./intro.module.css";
 
 export function GameOver({ restart }: { restart: () => void }) {
@@ -15,8 +15,14 @@ export function GameOver({ restart }: { restart: () => void }) {
         return () => clearInterval(fn);
     }, []);
 
+    const ref = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        ref.current?.focus();
+    }, []);
+
     return (
-        <div className={styles.div}>
+        <form className={styles.div} onSubmit={restart}>
             <h1>GAME OVER</h1>
             <p>
                 Jett ficou com toda a comida, suas bolas de pelos dominaram todo
@@ -24,10 +30,10 @@ export function GameOver({ restart }: { restart: () => void }) {
                 uma esperança...
             </p>
             <p>{timer}</p>
-            <button className={styles.button} onClick={restart}>
+            <button ref={ref} className={styles.button}>
                 Salvar a Princesa !!!
             </button>
-        </div>
+        </form>
     );
 }
 

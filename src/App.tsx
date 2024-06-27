@@ -4,6 +4,7 @@ import { Game } from "./game/scenes/Game";
 import { EDictionary } from "./game/map/map";
 import { Intro } from "./components/intro";
 import { GameOver } from "./components/game.over";
+import { FinishGame } from "./components/finish_game";
 
 type GameScreen = "intro" | "in_game" | "game_hover" | "finish_game";
 
@@ -21,7 +22,7 @@ function App() {
         intro: () => <Intro start={() => setGameScreen("in_game")} />,
         in_game: () => <PhaserGame ref={phaserRef} />,
         game_hover: () => <GameOver restart={() => setGameScreen("in_game")} />,
-        finish_game: () => <div></div>,
+        finish_game: () => <FinishGame />,
     };
 
     useEffect(() => {

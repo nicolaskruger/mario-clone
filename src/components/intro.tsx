@@ -2,11 +2,17 @@ type IntroProps = {
     start: () => void;
 };
 
+import { useEffect, useRef } from "react";
 import styles from "./intro.module.css";
 
 export function Intro({ start }: IntroProps) {
+    const ref = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        ref.current?.focus();
+    }, []);
     return (
-        <div className={styles.div}>
+        <form className={styles.div} onSubmit={start}>
             <h1>Lenda da Princesa WEN</h1>
             <p>
                 Morceguinho(meu gato preto) que deve enfrentar a terrível vilã
@@ -16,10 +22,10 @@ export function Intro({ start }: IntroProps) {
             <p>
                 comados <strong>w, a, s, d, j, k</strong>
             </p>
-            <button className={styles.button} onClick={start}>
+            <button ref={ref} className={styles.button}>
                 Salvar a Princesa !!!
             </button>
-        </div>
+        </form>
     );
 }
 

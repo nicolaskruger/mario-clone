@@ -83,7 +83,8 @@ export function updateJett(game: Game) {
         clearInterval(game.jett.fn);
         control.firstTime = false;
         game.jett.fn = setInterval(() => {
-            createNewBall(game, x, y, vel * Math.random() + 200);
+            if (game.gameState === "playing")
+                createNewBall(game, x, y, vel * Math.random() + 200);
         }, interval);
     }
 }
@@ -159,6 +160,7 @@ function killJett(game: Game) {
     delete jett.collideGround;
     game.balls.forEach((b) => destroyBall(game, b));
     jett.life--;
+    setTimeout(() => (game.gameState = "finish"), 5000);
 }
 
 export function hitJett(game: Game) {

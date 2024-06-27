@@ -1,4 +1,4 @@
-import { iterateMap } from "../aux/aux";
+import { WORLD_HEIGHT, WORLD_WIDTH, iterateMap } from "../aux/aux";
 import { collideBall, createBallM } from "../entities/ball";
 import { createBatMap } from "../entities/bat";
 import { collideAllFood, createFoodMap } from "../entities/food";
@@ -13,14 +13,14 @@ export const preloadMap = (game: Game) => {
     game.load.image(img, "ground.png");
 };
 
-const line00 = "_______J_________";
-const line01 = "_______G_________";
-const line02 = "_________________";
-const line03 = "__G___FN_________";
-const line04 = "_MN______________";
-const line05 = "GGGGGGGGGGGGGGGGG";
-
-const map = [line00, line01, line02, line03, line04, line05];
+const map = [
+    "______________________________________FFFFF__________________________________J",
+    "_____________________________________GGGGGG__________________________________G",
+    "____________________________________G_________________________________________",
+    "______F_F_F_F_F____________________G__GGG_______________________________G_____",
+    "_M___GGGGGGGGGGG_________B__B__B__GN_GGGGG__________G_BBB_G_________________FN",
+    "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
+];
 
 type ObjNickName = "M" | "G" | "_" | "B" | "F" | "N" | "J";
 
@@ -60,6 +60,7 @@ export const createMap = (game: Game) => {
         game.platform
     );
     game.bat.info.setCollideWorldBounds(true);
+    game.physics.world.setBounds(0, 0, tileSize * map[0].length, WORLD_HEIGHT);
 
     iterateMap(game, collideBall, collideAllFood, collideAllNip, collideJett);
 };

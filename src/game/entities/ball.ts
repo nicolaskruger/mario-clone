@@ -1,8 +1,8 @@
-import { Entity } from "../aux/aux";
+import { Entity, isOnScreen } from "../aux/aux";
 import { Collider, ColliderBundle } from "../collider/collider";
 import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";
-import { Bat, hit } from "./bat";
+import { hit } from "./bat";
 import { createNewFood } from "./food";
 import { createNewNip } from "./nip";
 
@@ -15,9 +15,11 @@ export const DIE_BALL = "b_die";
 export type Ball = {
     id: number;
     dead: boolean;
+    start: boolean;
     info: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     colliderPlayer: Collider;
     colliders: ColliderBundle[];
+    jettBall?: boolean;
 };
 
 export const preloadBall = (game: Game) => {
@@ -29,6 +31,7 @@ export const preloadBall = (game: Game) => {
 
 export const createBallM = (game: Game, x: number, y: number) => {
     const ball: Ball = {
+        start: false,
         id: Math.random(),
         dead: false,
         info: game.physics.add.sprite(x, y, SPRITE),
@@ -55,11 +58,13 @@ function collideNewBall(ball: Ball, game: Game) {
 
 export function createNewBall(game: Game, x: number, y: number, vel: number) {
     const ball: Ball = {
+        start: false,
         id: Math.random(),
         dead: false,
         info: game.physics.add.sprite(x, y, SPRITE),
         colliders: [],
         colliderPlayer: {} as Collider,
+        jettBall: true,
     };
     ball.info.setDepth(2);
     colideBallPlayer(ball, game);
@@ -181,15 +186,33 @@ const goLeft = (ball: Ball) => {
     info.anims.play(LEFT_BALL);
 };
 
-const tickBall = (ball: Ball) => {
+function destroyJettBall(ball: Ball, game: Game) {
+    const {
+        info: { x },
+    } = ball;
+    const {
+        cameras: {
+            main: { scrollX },
+        },
+    } = game;
+
+    if (x + tileSize / 2 < scrollX) destroyBall(game, ball);
+}
+
+const tickBall = (ball: Ball, game: Game) => {
+    if (!ball.start) {
+        ball.start = isOnScreen(game, ball.info);
+        return;
+    }
     const { info, dead } = ball;
     if (dead) return;
     if (info.body.velocity.x === 0) goLeft(ball);
     if (info.body.touching.left) goRight(ball);
     if (info.body.touching.right) goLeft(ball);
+    if (ball.jettBall) destroyJettBall(ball, game);
 };
 
 export const updateBall = (game: Game) => {
-    game.balls.forEach(tickBall);
+    game.balls.forEach((ball) => tickBall(ball, game));
 };
 

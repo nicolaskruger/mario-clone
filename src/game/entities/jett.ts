@@ -7,6 +7,7 @@ import { hit } from "./bat";
 const JETT = "jett";
 
 export type Jett = {
+    start: boolean;
     info: Entity;
     invisible: boolean;
     life: number;
@@ -17,6 +18,7 @@ export type Jett = {
 
 function initiateJett(): Jett {
     return {
+        start: false,
         info: {} as Entity,
         invisible: false,
         life: 3,
@@ -59,11 +61,16 @@ const listControl: ControlJett[] = [
     },
 ];
 
+export function startBossFight(game: Game) {
+    game.jett.start = true;
+}
+
 function lifeToIndex(game: Game) {
     return -game.jett.life + 3;
 }
 
 export function updateJett(game: Game) {
+    if (!game.jett.start) return;
     if (isDeadJett(game)) {
         if (game.jett.fn) clearInterval(game.jett.fn);
         delete game.jett.fn;

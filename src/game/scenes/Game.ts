@@ -25,7 +25,6 @@ export class Game extends Scene {
         this.balls = [];
         this.load.setPath("assets");
         this.load.image("star", "star.png");
-        this.load.image("background", "bg.png");
         this.load.image("logo", "logo.png");
         iterateMap(
             this,
@@ -43,8 +42,6 @@ export class Game extends Scene {
 
     create() {
         this.control = createControl(this);
-
-        this.add.image(512, 384, "background").setDepth(-2);
 
         iterateMap(
             this,

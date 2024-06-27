@@ -1,5 +1,8 @@
 import { Game } from "../scenes/Game";
 
+export const WORLD_WIDTH = 1024;
+export const WORLD_HEIGHT = 768;
+
 export const iterateMap = (game: Game, ...f: ((game: Game) => void)[]) =>
     f.forEach((f) => f(game));
 
@@ -48,4 +51,8 @@ export const isColliding = (a: Body, b: Body) => {
         )
     );
 };
+
+export function isOnScreen(game: Game, body: Body) {
+    return game.cameras.main.scrollX + WORLD_WIDTH > body.x;
+}
 

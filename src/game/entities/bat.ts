@@ -1,4 +1,4 @@
-import { Entity, isColliding } from "../aux/aux";
+import { Entity, WORLD_WIDTH, isColliding } from "../aux/aux";
 import { Collider } from "../collider/collider";
 import { Game } from "../scenes/Game";
 import { destroyBall } from "./ball";
@@ -131,7 +131,26 @@ function right(bat: Bat) {
     animated(bat, RIGHT, DEVIL_RIGHT);
 }
 
+function followPlayer(game: Game) {
+    if (game.jett.start) return;
+    const { x } = game.bat.info;
+    const halfWorld = WORLD_WIDTH / 2;
+
+    if (x > halfWorld && x < game.physics.world.bounds.width - halfWorld)
+        game.cameras.main.scrollX = x - halfWorld;
+    else if (x <= halfWorld) game.cameras.main.scrollX = 0;
+    else if (x >= game.physics.world.bounds.width - halfWorld) {
+        game.cameras.main.scrollX =
+            game.physics.world.bounds.width - WORLD_WIDTH;
+        game.physics.world.bounds.x =
+            game.physics.world.bounds.width - WORLD_WIDTH;
+        game.physics.world.bounds.width = WORLD_WIDTH;
+        game.jett.start = true;
+    }
+}
+
 export const updateBat = (game: Game) => {
+    followPlayer(game);
     const { A, D, J, K } = game.control;
 
     const { bat } = game;

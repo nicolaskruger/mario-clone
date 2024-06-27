@@ -358,6 +358,7 @@ const gameOver = (game: Game) => {
         delete game.jett.colliderPlayer;
     }
     game.balls.forEach((b) => b.colliderPlayer.destroy());
+    setTimeout(() => (game.gameState = "over"), 1200);
 };
 
 export const hit = (game: Game) => {

@@ -17,11 +17,13 @@ export class Game extends Scene {
     bat: Bat;
     jett: Jett;
     platform: Phaser.Physics.Arcade.StaticGroup;
+    gameState: "playing" | "over" | "finish";
     constructor() {
         super("Game");
     }
 
     preload() {
+        this.gameState = "playing";
         this.balls = [];
         this.load.setPath("assets");
         this.load.image("star", "star.png");
@@ -37,6 +39,7 @@ export class Game extends Scene {
         );
     }
     update(time: number, delta: number): void {
+        if (this.gameState === "over") return;
         iterateMap(this, updateBat, updateBall, updateJett);
     }
 

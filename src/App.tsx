@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { IRefPhaserGame, PhaserGame } from "./game/PhaserGame";
 import { Game } from "./game/scenes/Game";
+import { EDictionary } from "./game/map/map";
+import { Intro } from "./components/intro";
+
+type GameScreen = "intro" | "in_game" | "game_hover" | "finish_game";
 
 function App() {
     //  References to the PhaserGame component (game and scene are exposed)
@@ -9,19 +13,13 @@ function App() {
     const [food, setFood] = useState(0);
     const [endiabrado, setEndiabrado] = useState(0);
 
-    const addSprite = () => {
-        if (phaserRef.current) {
-            const scene = phaserRef.current.scene;
+    const [gameScreen, setGameScreen] = useState<GameScreen>("intro");
 
-            if (scene) {
-                // Add a new sprite to the current scene at a random position
-                const x = Phaser.Math.Between(64, scene.scale.width - 64);
-                const y = Phaser.Math.Between(64, scene.scale.height - 64);
-
-                //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-                scene.add.sprite(x, y, "star");
-            }
-        }
+    const dictionary: EDictionary<GameScreen, () => JSX.Element> = {
+        intro: () => <Intro start={() => setGameScreen("in_game")} />,
+        in_game: () => <PhaserGame ref={phaserRef} />,
+        game_hover: () => <div></div>,
+        finish_game: () => <div></div>,
     };
 
     useEffect(() => {
@@ -35,17 +33,7 @@ function App() {
         return () => clearInterval(func);
     }, []);
 
-    return (
-        <div id="app">
-            <PhaserGame ref={phaserRef} />
-            <div>
-                <div>
-                    <button className="button">{food}</button>
-                    <button className="button">{endiabrado}</button>
-                </div>
-            </div>
-        </div>
-    );
+    return <div id="app">{dictionary[gameScreen]()}</div>;
 }
 
 export default App;

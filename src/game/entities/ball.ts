@@ -1,4 +1,4 @@
-import { Entity, isOnScreen } from "../aux/aux";
+import { isOnScreen } from "../aux/aux";
 import { Collider, ColliderBundle } from "../collider/collider";
 import { tileSize } from "../map/map";
 import { Game } from "../scenes/Game";

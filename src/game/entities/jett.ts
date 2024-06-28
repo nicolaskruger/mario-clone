@@ -1,4 +1,4 @@
-import { Entity } from "../aux/aux";
+import { Entity, WORLD_WIDTH } from "../aux/aux";
 import { Collider } from "../collider/collider";
 import { Game } from "../scenes/Game";
 import { createNewBall, destroyBall } from "./ball";
@@ -69,8 +69,15 @@ function lifeToIndex(game: Game) {
     return -game.jett.life + 3;
 }
 
+function readyToStart(game: Game) {
+    return (
+        Math.abs(game.bat.info.x - game.jett.info.x) < WORLD_WIDTH / 2 ||
+        game.jett.start
+    );
+}
+
 export function updateJett(game: Game) {
-    if (!game.jett.start) return;
+    if (!readyToStart(game)) return;
     if (isDeadJett(game)) {
         if (game.jett.fn) clearInterval(game.jett.fn);
         delete game.jett.fn;

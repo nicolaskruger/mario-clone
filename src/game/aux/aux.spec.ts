@@ -1,5 +1,5 @@
 import { Game } from "../scenes/Game";
-import { iterateMap } from "./aux";
+import { Entity, distance, iterateMap } from "./aux";
 
 describe("aux", () => {
     let game: Game;
@@ -18,6 +18,12 @@ describe("aux", () => {
         iterateMap(game, mutateGame, mutateGame);
 
         expect(game.jett.life).toBe(life + 2);
+    });
+
+    test("distance", () => {
+        const e1: Entity = { x: 0, y: 0 } as Entity;
+        const e2: Entity = { x: 3, y: 4 } as Entity;
+        expect(distance(e1, e2)).toBe(5);
     });
 });
 

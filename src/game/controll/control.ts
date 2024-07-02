@@ -1,12 +1,15 @@
 import { Scene } from "phaser";
+import Phaser from "phaser";
+
+type Key = Phaser.Input.Keyboard.Key;
 
 export type Control = {
-    W: Phaser.Input.Keyboard.Key;
-    A: Phaser.Input.Keyboard.Key;
-    S: Phaser.Input.Keyboard.Key;
-    D: Phaser.Input.Keyboard.Key;
-    J: Phaser.Input.Keyboard.Key;
-    K: Phaser.Input.Keyboard.Key;
+    W: Key;
+    A: Key;
+    S: Key;
+    D: Key;
+    J: Key;
+    K: Key;
 };
 
 const keyGen = (

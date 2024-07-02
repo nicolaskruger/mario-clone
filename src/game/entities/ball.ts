@@ -29,7 +29,7 @@ export const preloadBall = (game: Game) => {
     });
 };
 
-export const createBallM = (game: Game, x: number, y: number) => {
+export function createBallM(game: Game, x: number, y: number) {
     const ball: Ball = {
         start: false,
         id: Math.random(),
@@ -40,7 +40,7 @@ export const createBallM = (game: Game, x: number, y: number) => {
     };
     ball.info.setDepth(2);
     game.balls.push(ball);
-};
+}
 
 function collideNewBall(ball: Ball, game: Game) {
     game.balls

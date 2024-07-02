@@ -1,11 +1,18 @@
 import { Game } from "../scenes/Game";
-import { Body, Entity, distance, isColliding, iterateMap } from "./aux";
+import {
+    Body,
+    Entity,
+    distance,
+    isColliding,
+    isOnScreen,
+    iterateMap,
+} from "./aux";
 
 describe("aux", () => {
     let game: Game;
 
     beforeEach(() => {
-        game = { jett: { life: 0 } } as Game;
+        game = { jett: { life: 0 }, cameras: { main: { scrollX: 0 } } } as Game;
     });
 
     test("iterate Game Map", () => {
@@ -31,6 +38,12 @@ describe("aux", () => {
         const bodyB: Body = { x: 1, y: 1, width: 2, height: 2 };
 
         expect(isColliding(bodyA, bodyB)).toBe(true);
+    });
+
+    test("is on screen", () => {
+        const body: Body = { x: 0 } as Body;
+
+        expect(isOnScreen(game, body)).toBeTruthy();
     });
 });
 
